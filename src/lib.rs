@@ -43,13 +43,14 @@
 #[cfg(test)]
 #[macro_use]
 extern crate approx;
-extern crate cast;
+pub extern crate cast;
 #[cfg(test)]
 #[macro_use]
 extern crate quickcheck;
-extern crate typenum;
+pub extern crate typenum;
 
 use core::cmp::{self, Ordering};
+use core::fmt::Display;
 use core::marker::PhantomData;
 use core::{f64, fmt, mem, ops, u16, u32, u64, u8};
 
