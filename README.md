@@ -6,6 +6,9 @@ Working with Python 3.9.17
 14.0
 ```
 
+Jupyter notebook: https://github.com/urbanij/posit/blob/master/py-posit/notebooks/demo.ipynb
+
+<!-- [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/urbanij/posit/master?labpath=py-posit%2Fnotebooks%2Fdemo.ipynb) -->
 
 # Original README below:
 ---
