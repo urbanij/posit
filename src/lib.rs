@@ -43,24 +43,26 @@
 #[cfg(test)]
 #[macro_use]
 extern crate approx;
-extern crate cast;
+pub extern crate cast;
 #[cfg(test)]
 #[macro_use]
 extern crate quickcheck;
-extern crate typenum;
+pub extern crate typenum;
 
+use core::cmp::{self, Ordering};
+use core::fmt::Display;
 use core::marker::PhantomData;
 use core::{f64, fmt, mem, ops, u16, u32, u64, u8};
-use core::cmp::{self, Ordering};
 
-use cast::{Error, i16, i32, u16, u32, u64};
-use typenum::{Cmp, Less, U0, U1, U16, U17, U2, U3, U32, U4, U5, U6, U7, U8,
-              U9, Unsigned};
+use cast::{i16, i32, u16, u32, u64, Error};
+use typenum::{Cmp, Less, Unsigned, U0, U1, U16, U17, U2, U3, U32, U4, U5, U6, U7, U8, U9};
 #[cfg(not(feature = "const-fn"))]
 use typenum::{Greater, U33};
 #[cfg(feature = "const-fn")]
-use typenum::{U10, U11, U12, U13, U14, U15, U18, U19, U20, U21, U22, U23, U24,
-              U25, U26, U27, U28, U29, U30, U31};
+use typenum::{
+    U10, U11, U12, U13, U14, U15, U18, U19, U20, U21, U22, U23, U24, U25, U26, U27, U28, U29, U30,
+    U31,
+};
 
 /// A posit
 ///
@@ -88,17 +90,9 @@ where
     }
 }
 
-impl<BITS, NBITS, ES> Copy for Posit<BITS, NBITS, ES>
-where
-    BITS: Copy,
-{
-}
+impl<BITS, NBITS, ES> Copy for Posit<BITS, NBITS, ES> where BITS: Copy {}
 
-impl<BITS, NBITS, ES> Eq for Posit<BITS, NBITS, ES>
-where
-    BITS: Eq,
-{
-}
+impl<BITS, NBITS, ES> Eq for Posit<BITS, NBITS, ES> where BITS: Eq {}
 
 impl<BITS, NBITS, ES> PartialEq for Posit<BITS, NBITS, ES>
 where
@@ -112,9 +106,9 @@ where
 macro_rules! posit {
     ($bits:ident, $dbits:ident, $limit:ident, $bits_size:expr) => {
         impl<NBITS, ES> Posit<$bits, NBITS, ES>
-            where
-                ES: Unsigned,
-                NBITS: Unsigned,
+        where
+            ES: Unsigned,
+            NBITS: Unsigned,
         {
             #[cfg(not(feature = "const-fn"))]
             /// Creates a new posit from the bit pattern `bits`
@@ -154,8 +148,10 @@ macro_rules! posit {
 
             /// Returns size, in bits, of the exponent component of `self`
             pub fn exponent_size(self) -> u8 {
-                cmp::min(Self::nbits() - Self::sign_size() - self.regime_size(),
-                         ES::to_u8())
+                cmp::min(
+                    Self::nbits() - Self::sign_size() - self.regime_size(),
+                    ES::to_u8(),
+                )
             }
 
             /// Returns the smallest integer greater than or equal to `self`
@@ -169,13 +165,15 @@ macro_rules! posit {
 
             /// Returns size, in bits, of the fraction component of `self`
             pub fn fraction_size(self) -> u8 {
-                Self::nbits() - Self::sign_size() - self.regime_size() -
-                    self.exponent_size()
+                Self::nbits() - Self::sign_size() - self.regime_size() - self.exponent_size()
             }
 
             /// Largest positive value that this posit can hold
             pub fn largest() -> Self {
-                Posit { bits: (1 << Self::nbits() - 1), _marker: PhantomData }
+                Posit {
+                    bits: (1 << Self::nbits() - 1),
+                    _marker: PhantomData,
+                }
             }
 
             /// Returns `true` if this value is not infinity
@@ -199,8 +197,7 @@ macro_rules! posit {
                 // first one and add one", but this only seems to be true for
                 // exact posits, i.e. posits with fractional part equal to zero
                 if self.fraction() == 0 {
-                    self.bits = (self.bits ^
-                                 (Self::bits_mask() & !Self::sign_mask())) + 1;
+                    self.bits = (self.bits ^ (Self::bits_mask() & !Self::sign_mask())) + 1;
                 } else {
                     unimplemented!()
                 }
@@ -211,8 +208,7 @@ macro_rules! posit {
             /// Returns the size, in bits, of the regime component
             pub fn regime_size(self) -> u8 {
                 // left aligned bits
-                let bits = self.abs().bits <<
-                    (Self::bits_size() - Self::nbits());
+                let bits = self.abs().bits << (Self::bits_size() - Self::nbits());
 
                 // chop off the sign bit
                 let bits = bits << Self::sign_size();
@@ -230,15 +226,16 @@ macro_rules! posit {
 
             /// Returns the sign bit
             pub fn sign(self) -> $bits {
-                (self.bits & Self::sign_mask())
-                    >> (Self::nbits() - Self::sign_size())
+                (self.bits & Self::sign_mask()) >> (Self::nbits() - Self::sign_size())
             }
 
             /// Smallest positive value that this posit can hold
             pub fn smallest() -> Self {
-                Posit { bits: 1, _marker: PhantomData }
+                Posit {
+                    bits: 1,
+                    _marker: PhantomData,
+                }
             }
-
 
             /// Returns the integer part of `self`
             #[cfg(unimplemented)]
@@ -265,7 +262,10 @@ macro_rules! posit {
             }
 
             fn infinity() -> Self {
-                Posit { bits: 1 << (Self::nbits() - 1), _marker: PhantomData }
+                Posit {
+                    bits: 1 << (Self::nbits() - 1),
+                    _marker: PhantomData,
+                }
             }
 
             fn is_one(self) -> bool {
@@ -283,14 +283,16 @@ macro_rules! posit {
 
             #[cfg(unused)]
             fn one() -> Self {
-                Posit { bits: (1 << (Self::nbits() - 2)), _marker: PhantomData }
+                Posit {
+                    bits: (1 << (Self::nbits() - 2)),
+                    _marker: PhantomData,
+                }
             }
 
             /// Returns the regime as an exponent
             fn regime(self) -> i8 {
                 // left aligned bits
-                let bits = self.abs().bits <<
-                    (Self::bits_size() - Self::nbits());
+                let bits = self.abs().bits << (Self::bits_size() - Self::nbits());
 
                 // chop off the sign bit
                 let bits = bits << Self::sign_size();
@@ -298,7 +300,11 @@ macro_rules! posit {
                 let lz = bits.leading_zeros() as i8;
                 let lo = (!bits).leading_zeros() as i8;
 
-                if lz == 0 { lo - 1 } else { -lz }
+                if lz == 0 {
+                    lo - 1
+                } else {
+                    -lz
+                }
             }
 
             fn sign_mask() -> $bits {
@@ -310,7 +316,10 @@ macro_rules! posit {
             }
 
             fn zero() -> Self {
-                Posit { bits: 0, _marker: PhantomData }
+                Posit {
+                    bits: 0,
+                    _marker: PhantomData,
+                }
             }
         }
 
@@ -340,9 +349,9 @@ macro_rules! posit {
 
             fn cast(p: Posit<$bits, NBITS, ES>) -> Self::Output {
                 if p.is_zero() {
-                    return 0.
+                    return 0.;
                 } else if p.is_infinity() {
-                    return 1. / 0.
+                    return 1. / 0.;
                 }
 
                 let bits_size = 64;
@@ -352,8 +361,7 @@ macro_rules! posit {
                 let fraction_size = bits_size - sign_size - exponent_size;
 
                 // XXX(i32) Here we assume that ES < 32
-                let posit_exponent = (1 << ES::to_u8()) * i32(p.regime()) +
-                    p.exponent() as i32;
+                let posit_exponent = (1 << ES::to_u8()) * i32(p.regime()) + p.exponent() as i32;
 
                 let (exponent, fraction_bits) =
                     if let Ok(exponent) = u64(posit_exponent + exponent_bias) {
@@ -361,9 +369,10 @@ macro_rules! posit {
                             // overflow
                             ((1 << exponent_size) - 1, (1 << fraction_size) - 1)
                         } else {
-                            (exponent,
-                             u64(p.fraction()) <<
-                             (fraction_size - p.fraction_size()))
+                            (
+                                exponent,
+                                u64(p.fraction()) << (fraction_size - p.fraction_size()),
+                            )
                         }
                     } else {
                         // underflow
@@ -373,16 +382,12 @@ macro_rules! posit {
                 let sign_bits = u64(p.sign()) << (bits_size - sign_size);
                 let exponent_bits = exponent << fraction_size;
 
-                unsafe {
-                    mem::transmute(sign_bits |
-                                   exponent_bits |
-                                   fraction_bits)
-                }
+                unsafe { mem::transmute(sign_bits | exponent_bits | fraction_bits) }
             }
         }
 
         impl<NBITS, ES> cast::From<f64> for Posit<$bits, NBITS, ES>
-            where
+        where
             ES: Unsigned,
             NBITS: Unsigned,
         {
@@ -402,29 +407,26 @@ macro_rules! posit {
                 let sign_size = 1;
                 let exponent_size = 11;
                 let exponent_bias = (1i16 << (exponent_size - 1)) - 1;
-                let ieee754_fraction_size = bits_size -
-                    sign_size - exponent_size;
+                let ieee754_fraction_size = bits_size - sign_size - exponent_size;
 
                 let exponent_mask = (1 << exponent_size) - 1;
                 let fraction_mask = (1 << ieee754_fraction_size) - 1;
 
                 let bits: u64 = unsafe { mem::transmute(x) };
-                let ieee754_exponent = ((bits >> ieee754_fraction_size) &
-                                        exponent_mask) as i16 - exponent_bias;
+                let ieee754_exponent =
+                    ((bits >> ieee754_fraction_size) & exponent_mask) as i16 - exponent_bias;
                 let ieee754_fraction = bits & fraction_mask;
 
                 let max_exponent = 2 * (1 << ES::to_u8()) * (i16(nbits) - 2);
 
                 // clamp exponent
-                let posit_exponent = cmp::min(cmp::max(ieee754_exponent,
-                                                       -max_exponent),
-                                              max_exponent);
+                let posit_exponent =
+                    cmp::min(cmp::max(ieee754_exponent, -max_exponent), max_exponent);
 
                 let sign = (bits >> (bits_size - sign_size)) as $bits;
 
                 let regime = posit_exponent >> ES::to_u8();
-                let exponent = (posit_exponent -
-                                regime * (1 << ES::to_u8())) as $bits;
+                let exponent = (posit_exponent - regime * (1 << ES::to_u8())) as $bits;
 
                 let (regime_bits, regime_size) = if regime < 0 {
                     (1, (1 - regime) as u8)
@@ -434,23 +436,20 @@ macro_rules! posit {
                     ((1 << (regime + 2)) - 2, regime as u8 + 2)
                 };
 
-                let exponent_size = cmp::min(nbits -
-                                             Self::sign_size() - regime_size,
-                                             ES::to_u8());
+                let exponent_size = cmp::min(nbits - Self::sign_size() - regime_size, ES::to_u8());
                 let exponent_mask = (1 << exponent_size) - 1;
 
-                let fraction_size = nbits - Self::sign_size() -
-                    regime_size - exponent_size;
+                let fraction_size = nbits - Self::sign_size() - regime_size - exponent_size;
 
-                let mut bits = regime_bits << (nbits - Self::sign_size() -
-                                               regime_size);
-                bits |= (exponent & exponent_mask) <<
-                    (nbits - Self::sign_size() -
-                     regime_size - exponent_size);
-                bits |= (ieee754_fraction >> (ieee754_fraction_size -
-                                              fraction_size)) as $bits;
+                let mut bits = regime_bits << (nbits - Self::sign_size() - regime_size);
+                bits |= (exponent & exponent_mask)
+                    << (nbits - Self::sign_size() - regime_size - exponent_size);
+                bits |= (ieee754_fraction >> (ieee754_fraction_size - fraction_size)) as $bits;
 
-                let p = Posit { bits: bits, _marker: PhantomData };
+                let p = Posit {
+                    bits: bits,
+                    _marker: PhantomData,
+                };
 
                 if sign == 1 {
                     Ok(-p)
@@ -466,8 +465,7 @@ macro_rules! posit {
             NBITS: Unsigned,
         {
             fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-                f
-                    .debug_struct("Posit")
+                f.debug_struct("Posit")
                     .field("bits", &self.bits)
                     .field("nbits", &NBITS::to_u8())
                     .field("sign", &self.sign())
@@ -492,7 +490,7 @@ macro_rules! posit {
         }
 
         impl<NBITS, ES> ops::Add for Posit<$bits, NBITS, ES>
-            where
+        where
             ES: Unsigned,
             NBITS: Unsigned,
         {
@@ -515,10 +513,8 @@ macro_rules! posit {
                 let nbits = Self::nbits();
 
                 // XXX(i32) here we assume ES < 32
-                let lhs_e = i32(self.regime()) * (1 << es) +
-                    self.exponent() as i32;
-                let rhs_e = i32(rhs.regime()) * (1 << es) +
-                    rhs.exponent() as i32;
+                let lhs_e = i32(self.regime()) * (1 << es) + self.exponent() as i32;
+                let rhs_e = i32(rhs.regime()) * (1 << es) + rhs.exponent() as i32;
 
                 let lhs_sign = self.sign();
                 let lhs_fs = self.fraction_size();
@@ -617,15 +613,15 @@ macro_rules! posit {
                 let max_exponent = 2 * (i32(nbits) - 2) * (1 << es);
                 if s_e > max_exponent {
                     if s_sign == 1 {
-                        return -Self::largest()
+                        return -Self::largest();
                     } else {
-                        return Self::largest()
+                        return Self::largest();
                     }
                 } else if s_e < -max_exponent {
                     if s_sign == 1 {
-                        return -Self::smallest()
+                        return -Self::smallest();
                     } else {
-                        return Self::smallest()
+                        return Self::smallest();
                     }
                 }
 
@@ -643,20 +639,15 @@ macro_rules! posit {
                     (Self::bits_mask() << 1) & regime_mask
                 };
 
-                let exponent_size = cmp::min(nbits -
-                                             Self::sign_size() - regime_size,
-                                             es);
+                let exponent_size = cmp::min(nbits - Self::sign_size() - regime_size, es);
                 let exponent_mask = (1 << exponent_size) - 1;
 
-                let fraction_size = nbits - Self::sign_size() -
-                    regime_size - exponent_size;
+                let fraction_size = nbits - Self::sign_size() - regime_size - exponent_size;
 
-                let mut bits = regime_bits << (nbits - Self::sign_size() -
-                                               regime_size);
+                let mut bits = regime_bits << (nbits - Self::sign_size() - regime_size);
 
-                bits |= (exponent & exponent_mask) <<
-                    (nbits - Self::sign_size() -
-                     regime_size - exponent_size);
+                bits |= (exponent & exponent_mask)
+                    << (nbits - Self::sign_size() - regime_size - exponent_size);
 
                 // here we remove the hidden bit
                 bits |= if fraction_size > s_fs {
@@ -665,7 +656,10 @@ macro_rules! posit {
                     (s_f >> (s_fs - fraction_size)) & !(1 << fraction_size)
                 };
 
-                let p = Posit { bits: bits, _marker: PhantomData };
+                let p = Posit {
+                    bits: bits,
+                    _marker: PhantomData,
+                };
 
                 if s_sign == 1 {
                     -p
@@ -676,7 +670,7 @@ macro_rules! posit {
         }
 
         impl<NBITS, ES> ops::Div for Posit<$bits, NBITS, ES>
-            where
+        where
             ES: Unsigned,
             NBITS: Unsigned,
         {
@@ -688,7 +682,7 @@ macro_rules! posit {
         }
 
         impl<NBITS, ES> ops::Mul for Posit<$bits, NBITS, ES>
-            where
+        where
             ES: Unsigned,
             NBITS: Unsigned,
         {
@@ -700,13 +694,13 @@ macro_rules! posit {
                     if rhs.is_infinity() {
                         panic!("NaN")
                     } else {
-                        return Self::zero()
+                        return Self::zero();
                     }
                 } else if rhs.is_zero() {
                     if self.is_infinity() {
                         panic!("NaN")
                     } else {
-                        return Self::zero()
+                        return Self::zero();
                     }
                 } else if self.is_one() {
                     if self.is_negative() {
@@ -734,10 +728,8 @@ macro_rules! posit {
                 let nbits = Self::nbits();
 
                 // XXX(i32) here we assume ES < 32
-                let lhs_e = i32(self.regime()) * (1 << es) +
-                    self.exponent() as i32;
-                let rhs_e = i32(rhs.regime()) * (1 << es) +
-                    rhs.exponent() as i32;
+                let lhs_e = i32(self.regime()) * (1 << es) + self.exponent() as i32;
+                let rhs_e = i32(rhs.regime()) * (1 << es) + rhs.exponent() as i32;
 
                 let lhs_fs = self.fraction_size();
                 let rhs_fs = rhs.fraction_size();
@@ -755,9 +747,10 @@ macro_rules! posit {
                 // XXX we should probably return maxpos / minpos at this point
                 // clip exponent
                 let max_exponent = 2 * (i32(nbits) - 2) * (1 << es);
-                let e = cmp::min(cmp::max(lhs_e + rhs_e + carry as i32,
-                                          -max_exponent),
-                                 max_exponent);
+                let e = cmp::min(
+                    cmp::max(lhs_e + rhs_e + carry as i32, -max_exponent),
+                    max_exponent,
+                );
 
                 let sign = self.sign() ^ rhs.sign();
                 let regime = (e >> es) as i8;
@@ -773,26 +766,23 @@ macro_rules! posit {
                     (bits_mask & (bits_mask << (regime + 1))) & regime_mask
                 };
 
-                let exponent_size = cmp::min(nbits -
-                                             Self::sign_size() - regime_size,
-                                             es);
+                let exponent_size = cmp::min(nbits - Self::sign_size() - regime_size, es);
                 let exponent_mask = (1 << exponent_size) - 1;
 
-                let fraction_size = nbits - Self::sign_size() -
-                    regime_size - exponent_size;
+                let fraction_size = nbits - Self::sign_size() - regime_size - exponent_size;
 
-                let mut bits = regime_bits << (nbits - Self::sign_size() -
-                                               regime_size);
-                bits |= (exponent & exponent_mask) <<
-                    (nbits - Self::sign_size() -
-                     regime_size - exponent_size);
+                let mut bits = regime_bits << (nbits - Self::sign_size() - regime_size);
+                bits |= (exponent & exponent_mask)
+                    << (nbits - Self::sign_size() - regime_size - exponent_size);
 
                 // here we remove the hidden bit
-                bits |= ((p_f >> carry as u8)
-                         >> (lhs_fs + rhs_fs - fraction_size)) as $bits &
-                    !(1 << fraction_size);
+                bits |= ((p_f >> carry as u8) >> (lhs_fs + rhs_fs - fraction_size)) as $bits
+                    & !(1 << fraction_size);
 
-                let p = Posit { bits: bits, _marker: PhantomData };
+                let p = Posit {
+                    bits: bits,
+                    _marker: PhantomData,
+                };
 
                 if sign == 1 {
                     -p
@@ -803,7 +793,7 @@ macro_rules! posit {
         }
 
         impl<NBITS, ES> ops::Sub for Posit<$bits, NBITS, ES>
-            where
+        where
             ES: Unsigned,
             NBITS: Unsigned,
         {
@@ -815,7 +805,7 @@ macro_rules! posit {
         }
 
         impl<NBITS, ES> ops::Neg for Posit<$bits, NBITS, ES>
-            where
+        where
             ES: Unsigned,
             NBITS: Unsigned,
         {
@@ -828,7 +818,7 @@ macro_rules! posit {
                 self
             }
         }
-    }
+    };
 }
 
 posit!(u8, u16, U9, 8);
@@ -851,12 +841,12 @@ macro_rules! new {
                 }
             }
         }
-    }
+    };
 }
 
 #[cfg(not(feature = "const-fn"))]
 macro_rules! new {
-    ($($tt:tt)+) => {}
+    ($($tt:tt)+) => {};
 }
 
 new!(U3, u8, 0b111);
@@ -899,11 +889,12 @@ macro_rules! ty {
 
         #[allow(non_snake_case)]
         pub fn $ty<T>(x: T) -> <$ty as cast::From<T>>::Output
-            where $ty: cast::From<T>,
+        where
+            $ty: cast::From<T>,
         {
             <$ty as cast::From<T>>::cast(x)
         }
-    }
+    };
 }
 
 ty!(P8E0, u8, U8, U0);
@@ -931,7 +922,7 @@ ty!(P32E8, u32, U32, U8);
 
 #[cfg(test)]
 mod tests {
-    use cast::{Error, From, f64};
+    use cast::{f64, Error, From};
     use quickcheck::TestResult;
     use typenum::{U1, U3, U4, U5};
 

@@ -1,3 +1,16 @@
+Added python bindings exploiting Python FFI lib.
+Working with Python 3.9.17
+```py
+>>> import jposit
+>>> jposit.from_bits(123, 8, 0)
+14.0
+```
+
+
+# Original README below:
+---
+
+
 # Status
 
 This crate is **UNMAINTAINED**. You may be interested in looking at https://gitlab.com/burrbull/softposit-rs.

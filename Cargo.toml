@@ -2,6 +2,7 @@
 authors = ["Jorge Aparicio <japaricious@gmail.com>"]
 name = "posit"
 version = "0.1.0"
+edition = "2021"
 
 [dependencies]
 typenum = "1.7.0"
