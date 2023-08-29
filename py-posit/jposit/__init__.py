@@ -1,8 +1,17 @@
 import math
 from . import _native
+import cffi
+
+ffi = cffi.FFI()
 
 _posit_from_bits = _native.lib.from_bits
-__version__ = 0 # TODO: override cargo version
+_get_version = _native.lib.get_version
+
+
+__version__ = ffi.string(_get_version()).decode('utf-8')
+
+__all__ = ['from_bits', '__version__', 'demo']
+
 
 def from_bits(bits, n, es):
   ans = _posit_from_bits(bits, n, es).__value
