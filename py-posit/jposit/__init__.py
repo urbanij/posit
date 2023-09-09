@@ -26,7 +26,8 @@ def from_double(x, n, es):
 
 
 def demo():
-  print (from_bits(123, 8, 0))
-  print (from_bits(123, 8, 5))
-  print (from_bits(123, 16, 1))
-  print (from_double(44.3, 16, 1))
+  print (f"{from_bits(123, 8, 0)=}")
+  print (f"{from_bits(123, 8, 5)=}")
+  print (f"{from_bits(123, 16, 1)=}")
+  print (f"{from_double(44.3, 16, 1)=}")
+  print (f"{from_double(44.3, 16, 6)=}")
