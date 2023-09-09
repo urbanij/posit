@@ -1,4 +1,4 @@
-use cast::f64;
+use cast;
 use posit::Posit;
 use posit::P8E1;
 use typenum::{U0, U1, U31, U8};
@@ -10,7 +10,7 @@ fn main() {
         }
 
         let p = P8E1::new(i as u8);
-        println!("{:3} - {}", i, f64(p));
+        println!("{:3} - {}", i, cast::f64(p));
     }
 
     let p2 = Posit::<u32, U31, U1>::new(2423);
@@ -19,4 +19,11 @@ fn main() {
     let p2 = Posit::<u8, U8, U0>::new(123);
     let value = cast::f64(p2);
     println!("{}", value);
+
+
+    let p3 = posit::P16E1(2.3);
+    println!("{:?}", p3);
+    println!("{}", cast::f64(p3.unwrap()));
+    
 }
+

@@ -22,6 +22,16 @@ struct rust__f64 {
 //Posit* from_bits(u64, u32, u32);
 rust__f64* from_bits(u64, u32, u32);
 
+typedef struct {
+    int is_error;
+    union {
+        rust__f64* value;
+        void* error;
+    } data;
+} RustF64Result;
+
+rust__f64* from_double(f64, u32, u32);
+
 
 #if 0
 /*************************/

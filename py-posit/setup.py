@@ -13,7 +13,7 @@ def build_native(spec):
     dylib=lambda: build.find_dylib("jposit",
                            in_path="target/release"),
     header_filename=lambda: build.find_header("jposit.h",
-                                        in_path="target"),
+                                        in_path="."),
     rtld_flags=["NOW", "NODELETE"],
   )
 
@@ -26,8 +26,6 @@ setup(
   zip_safe=False,
   platforms="any",
   install_requires=[
-    "wheel",
-    "setuptools",
     "milksnake",
   ],
   milksnake_tasks=[
