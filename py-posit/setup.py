@@ -1,4 +1,5 @@
 from setuptools import setup, find_packages
+import toml
 
 def build_native(spec):
   # Step 1: build the rust library
@@ -13,21 +14,25 @@ def build_native(spec):
     dylib=lambda: build.find_dylib("jposit",
                            in_path="target/release"),
     header_filename=lambda: build.find_header("jposit.h",
-                                        in_path="target"),
+                                        in_path="."),
     rtld_flags=["NOW", "NODELETE"],
   )
 
+with open("Cargo.toml", "r") as f:
+  c = f.read()
+
+toml_json = toml.loads(c)
+version = toml_json["package"]["version"]
 
 setup(
   name="jposit",
-  version="0.1.0",
+  version=version,
   packages=find_packages(),
   include_package_data=True,
   zip_safe=False,
   platforms="any",
   install_requires=[
-    "wheel",
-    "setuptools",
+    "toml",
     "milksnake",
   ],
   milksnake_tasks=[

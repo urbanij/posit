@@ -50,7 +50,6 @@ extern crate quickcheck;
 pub extern crate typenum;
 
 use core::cmp::{self, Ordering};
-use core::fmt::Display;
 use core::marker::PhantomData;
 use core::{f64, fmt, mem, ops, u16, u32, u64, u8};
 
