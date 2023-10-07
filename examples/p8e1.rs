@@ -20,10 +20,7 @@ fn main() {
     let value = cast::f64(p2);
     println!("{}", value);
 
-
     let p3 = posit::P16E1(2.3);
     println!("{:?}", p3);
     println!("{}", cast::f64(p3.unwrap()));
-    
 }
-
