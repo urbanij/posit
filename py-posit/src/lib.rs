@@ -1,13 +1,9 @@
 use colored::Colorize;
 use posit::cast;
 use posit::*;
-use std::ffi::CString;
-use std::os::raw::c_char;
+use pyo3::prelude::*;
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
-
-#[allow(non_camel_case_types)]
-type rust__f64 = f64;
 
 macro_rules! match_bits {
     ($n:expr, $es:expr, $bits:expr => { $($n_lit:literal, $es_lit:literal => $typ:ty),* $(,)? }) => {
@@ -20,7 +16,7 @@ macro_rules! match_bits {
                     "{}",
                     format!("*** from_bits::<{}, {}> has no bindings attached. ***", $n, $es).red()
                 );
-                return Ok(Box::new(f64::NAN));
+                return f64::NAN;
             }
         }
     };
@@ -37,15 +33,15 @@ macro_rules! match_double {
                     "{}",
                     format!("*** from_double::<{}, {}> has no bindings attached. ***", $n, $es).red()
                 );
-                return Ok(Box::new(f64::NAN));
+                return f64::NAN;
             }
         }
     };
 }
 
-#[unsafe(no_mangle)]
-pub extern "C" fn from_bits(bits: u64, n: u32, es: u32) -> Result<Box<rust__f64>, ()> {
-    let result = match_bits!(n, es, bits => {
+#[pyfunction]
+fn from_bits(bits: u64, n: u32, es: u32) -> f64 {
+    match_bits!(n, es, bits => {
         8, 0 => P8E0,
         8, 1 => P8E1,
         8, 2 => P8E2,
@@ -53,12 +49,11 @@ pub extern "C" fn from_bits(bits: u64, n: u32, es: u32) -> Result<Box<rust__f64>
         16, 0 => P16E0,
         16, 1 => P16E1,
         16, 2 => P16E2
-    });
-    Ok(Box::new(result))
+    })
 }
 
-#[unsafe(no_mangle)]
-pub extern "C" fn from_double(x: f64, n: u32, es: u32) -> Result<Box<rust__f64>, ()> {
+#[pyfunction]
+fn from_double(x: f64, n: u32, es: u32) -> f64 {
     let result = match_double!(x, n, es => {
         8, 0 => posit::P8E0,
         8, 1 => posit::P8E1,
@@ -69,11 +64,18 @@ pub extern "C" fn from_double(x: f64, n: u32, es: u32) -> Result<Box<rust__f64>,
         16, 2 => posit::P16E2
     });
 
-    Ok(Box::new(result.unwrap_or_else(|_| f64::NAN)))
+    result.unwrap_or(f64::NAN)
 }
 
-#[unsafe(no_mangle)]
-pub extern "C" fn get_version() -> *const c_char {
-    let c_str = CString::new(VERSION).expect("CString creation failed");
-    c_str.into_raw()
+#[pyfunction]
+fn get_version() -> String {
+    VERSION.to_string()
+}
+
+#[pymodule]
+fn jposit(py: Python, m: &PyModule) -> PyResult<()> {
+    m.add_function(wrap_pyfunction!(from_bits, py)?)?;
+    m.add_function(wrap_pyfunction!(from_double, py)?)?;
+    m.add_function(wrap_pyfunction!(get_version, py)?)?;
+    Ok(())
 }

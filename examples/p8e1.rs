@@ -1,7 +1,7 @@
 use cast;
-use posit::Posit;
 use posit::P8E1;
-use typenum::{U0, U1, U31, U8};
+use posit::Posit;
+use typenum::{U0, U1, U8, U31};
 
 fn main() {
     for i in 0u16.. {

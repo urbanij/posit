@@ -7,3 +7,10 @@ repos:
         language: script
         types: [toml]
         pass_filenames: false
+
+      # - id: rustfmt
+      #   name: rustfmt
+      #   description: Check if all files follow the rustfmt style
+      #   entry: cargo fmt --all -- --color always
+      #   language: system
+      #   pass_filenames: false

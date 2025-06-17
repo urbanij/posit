@@ -1,3 +1,21 @@
+```sh
+uv venv
+source .venv/bin/activate
+uv pip install maturin
+# if macOS
+uv pip install pip
+
+maturin develop
+python
+>>> import jposit
+>>> jposit.from_bits(...)
+>>>
+```
+
+---
+Deprecated:
+
+
 [![Rust](https://github.com/urbanij/posit/actions/workflows/rust.yml/badge.svg)](https://github.com/urbanij/posit/actions/workflows/rust.yml)
 
 # Posit
