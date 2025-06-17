@@ -1,0 +1,9 @@
+repos:
+  - repo: local
+    hooks:
+      - id: check-version
+        name: Check Cargo.toml Version Matches Git Tag
+        entry: ./ci/check_version.sh
+        language: script
+        types: [toml]
+        pass_filenames: false
