@@ -901,6 +901,7 @@ ty!(P8E1, u8, U8, U1);
 ty!(P8E2, u8, U8, U2);
 ty!(P8E3, u8, U8, U3);
 ty!(P8E4, u8, U8, U4);
+ty!(P8E5, u8, U8, U5);
 
 ty!(P16E0, u16, U16, U0);
 ty!(P16E1, u16, U16, U1);

@@ -1,7 +1,7 @@
 [package]
 name = "jposit"
 version = "0.2.1"
-edition = "2021"
+edition = "2024"
 
 # [workspace]
 
@@ -10,6 +10,7 @@ name = "jposit"
 crate-type = ["cdylib"]
 
 [dependencies]
+colored = "3"
 posit = { path = "../" }
 
 [build-dependencies]

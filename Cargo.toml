@@ -2,7 +2,7 @@
 authors = ["Jorge Aparicio <japaricious@gmail.com>"]
 name = "posit"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 
 [dependencies]
 typenum = "1.7.0"
@@ -17,3 +17,9 @@ quickcheck = "0.4.1"
 
 [features]
 const-fn = []
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = [
+  'cfg(unimplemented)',
+  'cfg(unused)',
+] }
