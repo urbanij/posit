@@ -2,21 +2,53 @@ name: CI
 
 on:
   push:
-    branches: [ "**" ]
+    branches:
+      - main
+      - dev
+    tags:
+      - '*'
   pull_request:
-    branches: [ "**" ]
+  workflow_dispatch:
 
-env:
-  CARGO_TERM_COLOR: always
+permissions:
+  contents: read
 
 jobs:
-  build:
-
-    runs-on: ubuntu-latest
-
+  linux:
+    runs-on: ${{ matrix.platform.runner }}
+    strategy:
+      matrix:
+        platform:
+          - runner: ubuntu-latest
+            target: x86_64
+          - runner: macos-latest
+            target: arm64
     steps:
-    - uses: actions/checkout@v2
-    - name: Build
-      run: cargo build --verbose
-    - name: Run tests
-      run: cargo test --verbose
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.x
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "0.7.13"
+      - name: Prepare environment
+        run: |
+          uv venv
+          source .venv/bin/activate
+          uv pip install maturin pip
+      - name: Run maturin and demo
+        run: |
+          source .venv/bin/activate
+          cd py-posit
+          maturin develop
+          make demo
+
+      - name: Publish wheel
+        env:
+          MATURIN_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+        run: |
+          source .venv/bin/activate
+          cd py-posit
+          maturin publish --no-sdist --skip-existing -o wheels -i python --username __token__
+
