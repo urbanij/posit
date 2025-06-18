@@ -14,7 +14,7 @@ build: install-deps
 # 	pip install --force-reinstall dist/jposit-*py3-none-*.whl
 
 demo:
-	python -c "import sys, jposit; print(f'Python{sys.version}'); print(f'jposit v:{jposit.__version__}'); jposit.demo()"
+	python -c "import sys, jposit; print(f'Python{sys.version}'); print(f'jposit v{jposit.__version__}'); jposit.__demo()"
 
 clean:
 	rm -rf */**/*.so */**/__pycache__

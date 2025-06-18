@@ -68,7 +68,7 @@ fn from_double(x: f64, n: u32, es: u32) -> f64 {
 }
 
 #[pyfunction]
-fn get_version() -> String {
+fn __get_version() -> String {
     VERSION.to_string()
 }
 
@@ -76,6 +76,6 @@ fn get_version() -> String {
 fn jposit(py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(from_bits, py)?)?;
     m.add_function(wrap_pyfunction!(from_double, py)?)?;
-    m.add_function(wrap_pyfunction!(get_version, py)?)?;
+    m.add_function(wrap_pyfunction!(__get_version, py)?)?;
     Ok(())
 }
