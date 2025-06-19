@@ -17,3 +17,9 @@ quickcheck = "0.4.1"
 
 [features]
 const-fn = []
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = [
+  'cfg(unimplemented)',
+  'cfg(unused)',
+] }

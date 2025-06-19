@@ -51,7 +51,7 @@ pub extern crate typenum;
 
 use core::cmp::{self, Ordering};
 use core::marker::PhantomData;
-use core::{f64, fmt, mem, ops, u16, u32, u64, u8};
+use core::{f64, fmt, ops};
 
 use cast::{i16, i32, u16, u32, u64, Error};
 use typenum::{Cmp, Less, Unsigned, U0, U1, U16, U17, U2, U3, U32, U4, U5, U6, U7, U8, U9};
@@ -381,7 +381,7 @@ macro_rules! posit {
                 let sign_bits = u64(p.sign()) << (bits_size - sign_size);
                 let exponent_bits = exponent << fraction_size;
 
-                unsafe { mem::transmute(sign_bits | exponent_bits | fraction_bits) }
+                f64::from_bits(sign_bits | exponent_bits | fraction_bits)
             }
         }
 
@@ -397,7 +397,7 @@ macro_rules! posit {
                     return Err(Error::NaN);
                 } else if x == 0. {
                     return Ok(Posit::<$bits, NBITS, ES>::zero());
-                } else if x == f64::INFINITY || x == f64::NEG_INFINITY {
+                } else if x.is_infinite() {
                     return Ok(Posit::<$bits, NBITS, ES>::infinity());
                 }
 
@@ -411,7 +411,7 @@ macro_rules! posit {
                 let exponent_mask = (1 << exponent_size) - 1;
                 let fraction_mask = (1 << ieee754_fraction_size) - 1;
 
-                let bits: u64 = unsafe { mem::transmute(x) };
+                let bits: u64 = x.to_bits();
                 let ieee754_exponent =
                     ((bits >> ieee754_fraction_size) & exponent_mask) as i16 - exponent_bias;
                 let ieee754_fraction = bits & fraction_mask;
@@ -446,7 +446,7 @@ macro_rules! posit {
                 bits |= (ieee754_fraction >> (ieee754_fraction_size - fraction_size)) as $bits;
 
                 let p = Posit {
-                    bits: bits,
+                    bits,
                     _marker: PhantomData,
                 };
 
@@ -656,7 +656,7 @@ macro_rules! posit {
                 };
 
                 let p = Posit {
-                    bits: bits,
+                    bits,
                     _marker: PhantomData,
                 };
 
@@ -779,7 +779,7 @@ macro_rules! posit {
                     & !(1 << fraction_size);
 
                 let p = Posit {
-                    bits: bits,
+                    bits,
                     _marker: PhantomData,
                 };
 
@@ -1073,7 +1073,7 @@ mod tests {
 
                 Ok(s == ans ||
                    relative_eq!(x + y, f64(s),
-                                epsilon = 1e-5, max_relative = (1. + 1e-5)))
+                                epsilon = 1e-5, max_relative = 1. + 1e-5))
             })().map(TestResult::from_bool).unwrap_or(TestResult::discard())
         }
 
@@ -1104,7 +1104,7 @@ mod tests {
 
                 Ok(p == ans ||
                    relative_eq!(x / y, f64(p),
-                                epsilon = 1e-5, max_relative = (1. + 1e-5)))
+                                epsilon = 1e-5, max_relative = 1. + 1e-5))
             })().map(TestResult::from_bool).unwrap_or(TestResult::discard())
         }
 
@@ -1115,7 +1115,7 @@ mod tests {
 
                 Ok(p == ans ||
                    relative_eq!(x * y, f64(p),
-                                epsilon = 1e-5, max_relative = (1. + 1e-5)))
+                                epsilon = 1e-5, max_relative = 1. + 1e-5))
             })().map(TestResult::from_bool).unwrap_or(TestResult::discard())
         }
 
@@ -1126,7 +1126,7 @@ mod tests {
 
                 Ok(s == ans ||
                    relative_eq!(x - y, f64(s),
-                                epsilon = 1e-5, max_relative = (1. + 1e-5)))
+                                epsilon = 1e-5, max_relative = 1. + 1e-5))
             })().map(TestResult::from_bool).unwrap_or(TestResult::discard())
         }
     }
