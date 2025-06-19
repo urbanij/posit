@@ -6,11 +6,8 @@ use std::os::raw::c_char;
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
-#[allow(non_camel_case_types)]
-type rust__f64 = f64;
-
 #[no_mangle]
-pub extern "C" fn from_bits(bits: u64, n: u32, es: u32) -> Result<Box<rust__f64>, ()> {
+pub extern "C" fn from_bits(bits: u64, n: u32, es: u32) -> Result<Box<Option<f64>>, ()> {
     let result = match (n, es) {
         (8, 0) => cast::f64(P8E0::new(bits as u8)),
         (8, 1) => cast::f64(P8E1::new(bits as u8)),
@@ -27,14 +24,14 @@ pub extern "C" fn from_bits(bits: u64, n: u32, es: u32) -> Result<Box<rust__f64>
                 )
                 .red()
             );
-            return Ok(Box::new(f64::NAN));
+            return Ok(Box::new(None));
         }
     };
-    Ok(Box::new(result))
+    Ok(Box::new(Some(result)))
 }
 
 #[no_mangle]
-pub extern "C" fn from_double(x: f64, n: u32, es: u32) -> Result<Box<rust__f64>, ()> {
+pub extern "C" fn from_double(x: f64, n: u32, es: u32) -> Result<Box<Option<f64>>, ()> {
     let result = match (n, es) {
         (8, 0) => posit::P8E0(x).map(cast::f64),
         (8, 1) => posit::P8E1(x).map(cast::f64),
@@ -52,10 +49,14 @@ pub extern "C" fn from_double(x: f64, n: u32, es: u32) -> Result<Box<rust__f64>,
                 .red()
             );
             // return Err(());
-            return Ok(Box::new(f64::NAN));
+            return Ok(Box::new(None));
         }
     };
-    Ok(result.map(Box::new).unwrap_or_else(|_| Box::new(f64::NAN)))
+    match result {
+        Ok(val) => Ok(Box::new(Some(val))),
+        Err(_) => Ok(Box::new(None)), // Conversion failed, but not a fatal error
+    }
+
 }
 
 #[no_mangle]
