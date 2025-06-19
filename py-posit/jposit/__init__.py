@@ -9,11 +9,10 @@ __all__ = ['from_bits', 'from_double']
 __version__ = __get_version()
 
 def from_bits(bits, n, es):
-  ans = __posit_from_bits(bits, n, es)
-  return None if math.isnan(ans) else ans
+  return __posit_from_bits(bits, n, es)
 
 def from_double(x, n, es):
-  if math.isnan(x):
-    return math.inf
   ans = __posit_from_double(x, n, es)
-  return None if math.isnan(ans) else ans
+  if ans is not None and math.isnan(x):
+      return math.inf
+  return ans
