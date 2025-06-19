@@ -10,6 +10,7 @@ name = "jposit"
 crate-type = ["cdylib"]
 
 [dependencies]
+colored = "3"
 posit = { path = "../" }
 
 [build-dependencies]

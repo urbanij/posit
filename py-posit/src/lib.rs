@@ -1,3 +1,4 @@
+use colored::Colorize;
 use posit::cast;
 use posit::*;
 use std::ffi::CString;
@@ -18,16 +19,19 @@ pub extern "C" fn from_bits(bits: u64, n: u32, es: u32) -> Result<Box<rust__f64>
         (16, 1) => cast::f64(P16E1::new(bits as u16)),
         (16, 2) => cast::f64(P16E2::new(bits as u16)),
         _ => {
-            println!(
-                "*** from_bits::<{}, {}> has no bindings attached. ***",
-                n, es
+            eprintln!(
+                "{}",
+                format!(
+                    "*** from_bits::<{}, {}> has no bindings attached. ***",
+                    n, es
+                )
+                .red()
             );
             return Ok(Box::new(f64::NAN));
         }
     };
     Ok(Box::new(result))
 }
-
 
 #[no_mangle]
 pub extern "C" fn from_double(x: f64, n: u32, es: u32) -> Result<Box<rust__f64>, ()> {
@@ -39,9 +43,13 @@ pub extern "C" fn from_double(x: f64, n: u32, es: u32) -> Result<Box<rust__f64>,
         (16, 1) => posit::P16E1(x).map(cast::f64),
         (16, 2) => posit::P16E2(x).map(cast::f64),
         _ => {
-            println!(
-                "*** from_double::<{}, {}> has no bindings attached. ***",
-                n, es
+            eprintln!(
+                "{}",
+                format!(
+                    "*** from_bits::<{}, {}> has no bindings attached. ***",
+                    n, es
+                )
+                .red()
             );
             // return Err(());
             return Ok(Box::new(f64::NAN));
