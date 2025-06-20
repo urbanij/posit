@@ -4,7 +4,7 @@ build-backend = "maturin"
 
 [project]
 name = "jposit"
-version = "0.1.0"
+version = "0.3.0-dev"
 description = "jposit"
 authors = [{ name = "Franceco Urbani", email = "francescourbanidue@gmail.com" }]
 readme = "README.md"
@@ -18,5 +18,4 @@ requires-python = ">=3.8,<3.14"
 dependencies = []
 
 [tool.maturin]
-# bindings = "pyo3"      # Assuming you use PyO3
 module-name = "jposit"

@@ -1,7 +1,7 @@
 [package]
 name = "jposit"
 version = "0.3.0-dev"
-authors = ["Frnacesco Urbani <francescourbanidue@gmail.com>"]
+authors = ["Francesco Urbani <francescourbanidue@gmail.com>"]
 description = "Rust and Python bindings for the Posit numerical format library."
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/urbanij/jposit"
@@ -20,3 +20,7 @@ crate-type = ["cdylib"]
 colored = "3"
 pyo3 = { version = "0.18", features = ["extension-module"] }
 posit = { path = "../" }
+
+[build-system]
+requires = ["maturin>=1.4"]
+build-backend = "maturin"
