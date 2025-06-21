@@ -4,7 +4,7 @@ build-backend = "maturin"
 
 [project]
 name = "jposit"
-version = "0.3.1-dev"
+version = "0.3.2-dev"
 description = "jposit"
 authors = [{ name = "Franceco Urbani", email = "francescourbanidue@gmail.com" }]
 readme = "README.md"

@@ -56,7 +56,7 @@ use core::{f64, fmt, ops, u16, u32, u64, u8};
 use cast::{i16, i32, u16, u32, u64, Error};
 use typenum::{Cmp, Less, Unsigned, U0, U1, U16, U17, U2, U3, U32, U4, U5, U6, U7, U8, U9};
 #[cfg(not(feature = "const-fn"))]
-use typenum::{Greater, U33};
+use typenum::{Greater, U33, U64};
 #[cfg(feature = "const-fn")]
 use typenum::{
     U10, U11, U12, U13, U14, U15, U18, U19, U20, U21, U22, U23, U24, U25, U26, U27, U28, U29, U30,
@@ -881,6 +881,8 @@ new!(U30, u32, 0b11_1111_1111_1111_1111_1111_1111_1111);
 new!(U31, u32, 0b111_1111_1111_1111_1111_1111_1111_1111);
 new!(U32, u32, 0b1111_1111_1111_1111_1111_1111_1111_1111);
 
+new!(U64, u64, 0xffff_ffff_ffff_ffff);
+
 // Type alias and checked cast function
 macro_rules! ty {
     ($ty:ident, $bits:ident, $nbits:ident, $es:ident) => {
@@ -895,6 +897,8 @@ macro_rules! ty {
         }
     };
 }
+
+ty!(P4E0, u8, U4, U0);
 
 ty!(P8E0, u8, U8, U0);
 ty!(P8E1, u8, U8, U1);
@@ -919,6 +923,16 @@ ty!(P32E5, u32, U32, U5);
 ty!(P32E6, u32, U32, U6);
 ty!(P32E7, u32, U32, U7);
 ty!(P32E8, u32, U32, U8);
+
+ty!(P64E0, u64, U64, U0);
+ty!(P64E1, u64, U64, U1);
+ty!(P64E2, u64, U64, U2);
+ty!(P64E3, u64, U64, U3);
+ty!(P64E4, u64, U64, U4);
+ty!(P64E5, u64, U64, U5);
+ty!(P64E6, u64, U64, U6);
+ty!(P64E7, u64, U64, U7);
+ty!(P64E8, u64, U64, U8);
 
 #[cfg(test)]
 mod tests {
